@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор случайных людей и университета</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .user-card img {
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .university-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Генератор случайных людей и университета</h1>
+    <button id="generateBtn">Сгенерировать случайного пользователя и университет</button>
+    <div id="userContainer"></div>
+
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', generateRandomUserAndUniversity);
+
+        async function generateRandomUserAndUniversity() {
+            try {
+                const userResponse = await fetch('https://randomuser.me/api/');
+                const userData = await userResponse.json();
+                const user = userData.results[0];
+
+                const universitiesResponse = await fetch(`http://universities.hipolabs.com/search?country=${encodeURIComponent(user.location.country)}`);
+                const universitiesData = await universitiesResponse.json();
+
+                const randomUniversity = universitiesData[Math.floor(Math.random() * universitiesData.length)];
+
+                const userContainer = document.getElementById('userContainer');
+                userContainer.innerHTML = '';
+
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+
+                const userImage = document.createElement('img');
+                userImage.src = user.picture.large;
+                userImage.alt = `${user.name.first} ${user.name.last}`;
+
+                const userName = document.createElement('h2');
+                userName.textContent = `${user.name.first} ${user.name.last}`;
+
+                const userEmail = document.createElement('p');
+                userEmail.textContent = user.email;
+
+                const userLocation = document.createElement('p');
+                userLocation.textContent = user.location.country;
+
+                userCard.appendChild(userImage);
+                userCard.appendChild(userName);
+                userCard.appendChild(userEmail);
+                userCard.appendChild(userLocation);
+
+                const universityInfo = document.createElement('div');
+                universityInfo.className = 'university-info';
+
+                const universityTitle = document.createElement('h3');
+                universityTitle.textContent = `Университет в ${user.location.country}`;
+
+                const universityName = document.createElement('p');
+                universityName.textContent = randomUniversity.name;
+
+                universityInfo.appendChild(universityTitle);
+                universityInfo.appendChild(universityName);
+
+                userContainer.appendChild(userCard);
+                userContainer.appendChild(universityInfo);
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+            }
+        }
+    </script>
+</body>
+</html>

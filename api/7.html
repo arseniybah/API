@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nationalize API Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nationalize API Example</h1>
+    <form id="nameForm">
+        <label for="nameInput">Enter a name:</label>
+        <input type="text" id="nameInput" name="name" required>
+        <button type="submit">Check Nationality</button>
+    </form>
+    <div class="result" id="result"></div>
+
+    <script>
+        document.getElementById('nameForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const name = document.getElementById('nameInput').value;
+            fetch(`https://api.nationalize.io/?name=${name}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    if (data.country.length > 0) {
+                        let resultText = `Possible nationalities for ${name}:<br>`;
+                        data.country.forEach(country => {
+                            resultText += `${country.country_id} (${Math.round(country.probability * 100)}%)<br>`;
+                        });
+                        resultDiv.innerHTML = resultText;
+                    } else {
+                        resultDiv.innerHTML = `No data found for ${name}.`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('result').innerHTML = 'An error occurred while fetching data.';
+                });
+        });
+    </script>
+</body>
+</html>
